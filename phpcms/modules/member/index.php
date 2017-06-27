@@ -179,9 +179,9 @@ class index extends foreground {
 						$message = str_replace(array('{click}','{url}','{username}','{email}','{password}'), array('<a href="'.$url.'">'.L('please_click').'</a>',$url,$userinfo['username'],$userinfo['email'],$password), $message);
  						sendmail($userinfo['email'], L('reg_verify_email'), $message);
 						//设置当前注册账号COOKIE，为第二步重发邮件所用
-						param::set_cookie('_regusername', $userinfo['username'], $cookietime);
-						param::set_cookie('_reguserid', $userid, $cookietime);
-						param::set_cookie('_reguseruid', $userinfo['phpssouid'], $cookietime);
+						$_SESSION['_regusername'] = $userinfo['username'];
+						$_SESSION['_reguserid'] = $userid;
+						$_SESSION['_reguseruid'] = $userinfo['phpssouid'];
 						showmessage(L('operation_success'), 'index.php?m=member&c=index&a=register&t=2');
 					} else {
 						//如果不需要邮箱认证、直接登录其他应用
@@ -265,9 +265,10 @@ class index extends foreground {
 	 * 测试邮件配置
 	 */
 	public function send_newmail() {
-		$_username = param::get_cookie('_regusername');
-		$_userid = param::get_cookie('_reguserid');
-		$_ssouid = param::get_cookie('_reguseruid');
+		$this->_session_start();	
+		$_username = $_SESSION['_regusername'];
+		$_userid = $_SESSION['_reguserid'];
+		$_ssouid = $_SESSION['_reguseruid'];
 		$newemail = $_GET['newemail'];
 
 		if($newemail=='' || !is_email($newemail)){//邮箱为空，直接返回错误
@@ -613,11 +614,7 @@ class index extends foreground {
 			}
 			
 			$username = isset($_POST['username']) && is_username($_POST['username']) ? trim($_POST['username']) : showmessage(L('username_empty'), HTTP_REFERER);
-			
-			//$password = isset($_POST['password']) && trim($_POST['password']) ? trim($_POST['password']) : showmessage(L('password_empty'), HTTP_REFERER);
-			//修补漏洞 2016-10-8 13:41:12
-			$password = isset($_POST['password']) && trim($_POST['password']) ? addslashes(urldecode(trim($_POST['password']))) : showmessage(L('password_empty'), HTTP_REFERER);
-
+			$password = isset($_POST['password']) && trim($_POST['password']) ? trim($_POST['password']) : showmessage(L('password_empty'), HTTP_REFERER);
 			is_password($_POST['password']) && is_badword($_POST['password'])==false ? trim($_POST['password']) : showmessage(L('password_format_incorrect'), HTTP_REFERER);
 			$cookietime = intval($_POST['cookietime']);
 			$synloginstr = ''; //同步登陆js代码

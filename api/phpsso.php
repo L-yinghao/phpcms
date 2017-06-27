@@ -125,11 +125,8 @@
 	if ($action == 'synlogin') {
 		
 		if(!isset($arr['uid'])) exit('0');
-		//$arr['uid'] = intval($arr['uid']);
-		//$phpssouid = $arr['uid'];
-		//2016-10-8 13:44:22补丁合并为同一行
-		$phpssouid = intval($arr['uid']);  
-		
+		$arr['uid'] = intval($arr['uid']);
+		$phpssouid = $arr['uid'];
 		$userinfo = $db->get_one(array('phpssouid'=>$phpssouid));
 				
 		if (!$userinfo) {

@@ -273,6 +273,7 @@ function execute_time() {
 function random($length, $chars = '0123456789') {
 	$hash = '';
 	$max = strlen($chars) - 1;
+	mt_srand();
 	for($i = 0; $i < $length; $i++) {
 		$hash .= $chars[mt_rand(0, $max)];
 	}
@@ -746,7 +747,7 @@ function pages($num, $curr_page, $perpage = 20, $urlrule = '', $array = array(),
 			if($curr_page==1) {
 				$multipage .= ' <span>1</span>';
 			} elseif($curr_page>6 && $more) {
-				$multipage .= ' <a href="'.pageurl($urlrule, 1, $array).'">1</a><a>..</a>';
+				$multipage .= ' <a href="'.pageurl($urlrule, 1, $array).'">1</a>..';
 			} else {
 				$multipage .= ' <a href="'.pageurl($urlrule, 1, $array).'">1</a>';
 			}
@@ -760,7 +761,7 @@ function pages($num, $curr_page, $perpage = 20, $urlrule = '', $array = array(),
 		}
 		if($curr_page<$pages) {
 			if($curr_page<$pages-5 && $more) {
-				$multipage .= ' <a>..</a><a href="'.pageurl($urlrule, $pages, $array).'">'.$pages.'</a> <a href="'.pageurl($urlrule, $curr_page+1, $array).'" class="a1">'.L('next').'</a>';
+				$multipage .= ' ..<a href="'.pageurl($urlrule, $pages, $array).'">'.$pages.'</a> <a href="'.pageurl($urlrule, $curr_page+1, $array).'" class="a1">'.L('next').'</a>';
 			} else {
 				$multipage .= ' <a href="'.pageurl($urlrule, $pages, $array).'">'.$pages.'</a> <a href="'.pageurl($urlrule, $curr_page+1, $array).'" class="a1">'.L('next').'</a>';
 			}
@@ -1525,8 +1526,7 @@ function seo($siteid, $catid = '', $title = '', $description = '', $keyword = ''
 	$seo['site_title'] =isset($site['site_title']) && !empty($site['site_title']) ? $site['site_title'] : $site['name'];
 	$seo['keyword'] = !empty($keyword) ? $keyword : $site['keywords'];
 	$seo['description'] = isset($description) && !empty($description) ? $description : (isset($cat['setting']['meta_description']) && !empty($cat['setting']['meta_description']) ? $cat['setting']['meta_description'] : (isset($site['description']) && !empty($site['description']) ? $site['description'] : ''));
-	$seo['title'] =  (isset($title) && !empty($title) ? $title.'_' : '').(isset($cat['setting']['meta_title']) && !empty($cat['setting']['meta_title']) ? $cat['setting']['meta_title'].'_' : (isset($cat['catname']) && !empty($cat['catname']) ? $cat['catname'].'_' : ''));
-	$seo['title'] = substr($seo['title'], 0,-1);
+	$seo['title'] =  (isset($title) && !empty($title) ? $title.' - ' : '').(isset($cat['setting']['meta_title']) && !empty($cat['setting']['meta_title']) ? $cat['setting']['meta_title'].' - ' : (isset($cat['catname']) && !empty($cat['catname']) ? $cat['catname'].' - ' : ''));
 	foreach ($seo as $k=>$v) {
 		$seo[$k] = str_replace(array("\n","\r"),	'', $v);
 	}
@@ -1590,7 +1590,7 @@ function siteurl($siteid) {
  */
 
 function upload_key($args) {
-	$pc_auth_key = md5(pc_base::load_config('system','auth_key').$_SERVER['HTTP_USER_AGENT']);
+	$pc_auth_key = md5(PC_PATH.'upload'.pc_base::load_config('system','auth_key').$_SERVER['HTTP_USER_AGENT']);
 	$authkey = md5($args.$pc_auth_key);
 	return $authkey;
 }
@@ -1601,11 +1601,11 @@ function upload_key($args) {
  */
 function get_auth_key($prefix,$suffix="") {
 	if($prefix=='login'){
-		$pc_auth_key = md5(pc_base::load_config('system','auth_key').ip());
+		$pc_auth_key = md5(PC_PATH.'login'.pc_base::load_config('system','auth_key').ip());
 	}else if($prefix=='email'){
-		$pc_auth_key = md5(pc_base::load_config('system','auth_key'));
+		$pc_auth_key = md5(PC_PATH.'email'.pc_base::load_config('system','auth_key'));
 	}else{
-		$pc_auth_key = md5(pc_base::load_config('system','auth_key').$suffix);
+		$pc_auth_key = md5(PC_PATH.'other'.pc_base::load_config('system','auth_key').$suffix);
 	}
 	$authkey = md5($prefix.$pc_auth_key);
 	return $authkey;
